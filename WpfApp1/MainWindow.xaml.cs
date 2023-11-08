@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using testWorkForSirius.Methods;
 using WpfApp1.Models;
 
+
 namespace WpfApp1
 {
     /// <summary>
@@ -64,7 +65,7 @@ namespace WpfApp1
             int id = 1;
             if (_canvases.Count > 0)
                 id = _canvases.Max(a => a.ID) + 1;
-            var text = getText(true, id);
+            var text = GetUI.GetText(true, id);
             var canvas = new Canvas()
             {
                 Width = 130,
@@ -72,7 +73,7 @@ namespace WpfApp1
                 Uid = "0" + id,
                 Children =
                 {
-                    getBorder(true),
+                    GetUI.GetBorder(true),
                     text
                 }
             };
@@ -107,20 +108,12 @@ namespace WpfApp1
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
             var canvas = (Canvas)sender;
-            if (canvas.Uid.StartsWith("0"))
-            {
-                canvas.Children.Clear();
-                canvas.Children.Add(getBorder(false));
-                canvas.Children.Add(getText(false, int.Parse(canvas.Uid.Remove(0, 1))));
-                canvas.Uid = canvas.Uid.Remove(0, 1).Insert(0, "1");
-            }
-            else
-            {
-                canvas.Children.Clear();
-                canvas.Children.Add(getBorder(true));
-                canvas.Children.Add(getText(true, int.Parse(canvas.Uid.Remove(0, 1))));
-                canvas.Uid = canvas.Uid.Remove(0, 1).Insert(0, "0");
-            }
+            var del = canvas.Uid.StartsWith("0");
+            canvas.Children.Clear();
+            canvas.Children.Add(GetUI.GetBorder(!del));
+            canvas.Children.Add(GetUI.GetText(!del, int.Parse(canvas.Uid.Remove(0, 1))));
+            canvas.Uid = canvas.Uid.Remove(0, 1).Insert(0, del ? "1": "0");
+
             checkDel();
         }
         private void checkDel()
@@ -135,44 +128,6 @@ namespace WpfApp1
                 }
             }
         }
-        private Border getBorder(bool good)
-        {
-            var border = new Border()
-            {
-                BorderThickness = new Thickness()
-                {
-                    Top = 2,
-                    Right = 2,
-                    Bottom = 2,
-                    Left = 2
-                },
-                Width = 130,
-                Height = 30
-            };
-            if (good)
-                border.BorderBrush = Brushes.Green;
-            else
-                border.BorderBrush = Brushes.Red;
-
-            return border;
-        }
-        private TextBlock getText(bool good, int id)
-        {
-            var text = new TextBlock()
-            {
-                Text = "Shape" + id,
-                FontSize = 12
-            };
-            if (good)
-                text.Foreground = Brushes.Green;
-            else
-                text.Foreground = Brushes.Red;
-
-
-            Canvas.SetTop(text, 5);
-            Canvas.SetLeft(text, 40);
-            return text;
-        }
         private void addPen(Point p2)
         {
             if (_canvases.Count <= 1)
@@ -180,9 +135,7 @@ namespace WpfApp1
 
             var start = _canvases.SkipLast(1).Last()._canvas;
             var p1 = start.TranslatePoint(new Point(65, 0), mainCanvas);
-            var shape = Methods.DrawLinkArrow(p1, p2);
-            mainCanvas.Children.Add(shape);
-            _shapes.Push(shape);
+            printPen(p1, p2);
         }
         private void reprintPen()
         {
@@ -200,11 +153,23 @@ namespace WpfApp1
                 var end = _canvases[i + 1]._canvas;
                 var p1 = start.TranslatePoint(new Point(65, 0), mainCanvas);
                 var p2 = end.TranslatePoint(new Point(65, 0), mainCanvas);
-                var shape = Methods.DrawLinkArrow(p1, p2);
-                mainCanvas.Children.Add(shape);
-                _shapes.Push(shape);
-
+                printPen(p1, p2);
             }
+        }
+        private void printPen (Point p1, Point p2)
+        {
+            if (p1.Y < p2.Y)
+            {
+                p1.Y += 30;
+            }
+            if (p1.Y > p2.Y)
+            {
+                p2.Y += 30;
+            }
+
+            var shape = GetUI.DrawLinkArrow(p1, p2);
+            mainCanvas.Children.Add(shape);
+            _shapes.Push(shape);
         }
     }
 }

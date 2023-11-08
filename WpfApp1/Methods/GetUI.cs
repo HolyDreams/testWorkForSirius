@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace testWorkForSirius.Methods
 {
-    class Methods
+    class GetUI
     {
         public static Shape DrawLinkArrow(Point p1, Point p2)
         {
@@ -48,10 +49,48 @@ namespace testWorkForSirius.Methods
             lineGroup.Children.Add(connectorGeometry);
             Path path = new Path();
             path.Data = lineGroup;
-            path.StrokeThickness = 2;
+            path.StrokeThickness = 1;
             path.Stroke = path.Fill = Brushes.Green;
 
             return path;
+        }
+        public static Border GetBorder(bool good)
+        {
+            var border = new Border()
+            {
+                BorderThickness = new Thickness()
+                {
+                    Top = 2,
+                    Right = 2,
+                    Bottom = 2,
+                    Left = 2
+                },
+                Width = 130,
+                Height = 30
+            };
+            if (good)
+                border.BorderBrush = Brushes.Green;
+            else
+                border.BorderBrush = Brushes.Red;
+
+            return border;
+        }
+        public static TextBlock GetText(bool good, int id)
+        {
+            var text = new TextBlock()
+            {
+                Text = "Shape" + id,
+                FontSize = 12
+            };
+            if (good)
+                text.Foreground = Brushes.Green;
+            else
+                text.Foreground = Brushes.Red;
+
+
+            Canvas.SetTop(text, 5);
+            Canvas.SetLeft(text, 40);
+            return text;
         }
     }
 }
